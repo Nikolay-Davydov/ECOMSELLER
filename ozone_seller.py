@@ -15,37 +15,25 @@ class OzoneSeller:
             'Api-Key': self.key,
         }
 
-    '''Получение всех акций'''
     def get_actions(self):
-        url = self.url + self.version + "/actions"
-        headers = self.get_headers()
-        result = requests.get(url, headers=headers)
-        all_actions = {}
-        if result.status_code == 200:
-            all_actions = result.json()['result']
-        else:
-            print(result.json()['message'])
+        '''Получение всех акций'''
+        result = self.do_request('get', '/actions', {})
+        all_actions = result['result'] if result['flag'] else {}
         return all_actions
 
-    '''Получение товаров подходящих к акции'''
     def get_candidates(self, action_id):
-        url = self.url + self.version + "/actions/candidates"
-        headers = self.get_headers()
+        '''Получение товаров подходящих к акции'''
         params = {
             "action_id": action_id,
             "limit": 10,
             "offset": 0,
         }
-        candidates = {}
-        result = requests.post(url, headers=headers, params=params)
-        if result.status_code == 200:
-            candidates = result.json()['result']['products']
-        else:
-            print(result.json()['message'])
+        result = self.do_request('post', '/actions/candidates', params)
+        candidates = result['result']['products'] if result['flag'] else {}
         return candidates
 
-    '''Добавление продукта к акции'''
     def add_product_to_action(self, action_id, product_id, action_price, stock):
+        '''Добавление продукта к акции'''
         url = self.url + self.version + "/actions/products/activate"
         params = {
             "action_id": action_id,
@@ -57,9 +45,21 @@ class OzoneSeller:
                 }
             ]
         }
+        result = self.do_request('post', '/actions/products/activate', params)
+        products_actions = result['result']['product_ids'] if result['flag'] else {}
+        return products_actions
+
+    def do_request(self, type_request, type, params):
+        '''Выполнение запросов'''
+        url = self.url + self.version + type
         headers = self.get_headers()
-        products_actions = requests.post(url, headers=headers, params=params)
-        return products_actions.json()
-
-
+        if type_request == 'get':
+            result = requests.get(url, headers=headers)
+        else:
+            result = requests.post(url, headers=headers, params=params)
+        if result.status_code == 200:
+            return {'flag': True,  'result': result.json()['result']}
+        else:
+            print(result.json()['message'])
+            return {'flag': False, 'result': {}}
 
