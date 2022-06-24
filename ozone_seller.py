@@ -23,9 +23,9 @@ class OzoneSeller:
     def get_candidates(self, action_id):
         '''Получение товаров подходящих к акции'''
         params = {
-            "action_id": action_id,
-            "limit": 10,
-            "offset": 0,
+            'action_id': action_id,
+            'limit': 10,
+            'offset': 0,
         }
         result = self.do_request('post', '/actions/candidates', params)
         candidates = getattr(result, 'products', {})
