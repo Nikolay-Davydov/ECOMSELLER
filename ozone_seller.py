@@ -17,8 +17,7 @@ class OzoneSeller:
 
     def get_actions(self):
         '''Получение всех акций'''
-        result = self.do_request('get', '/actions', {})
-        all_actions = result['result'] if result['flag'] else {}
+        all_actions = self.do_request('get', '/actions')
         return all_actions
 
     def get_candidates(self, action_id):
@@ -29,27 +28,26 @@ class OzoneSeller:
             "offset": 0,
         }
         result = self.do_request('post', '/actions/candidates', params)
-        candidates = result['result']['products'] if result['flag'] else {}
+        candidates = getattr(result, 'products', {})
         return candidates
 
     def add_product_to_action(self, action_id, product_id, action_price, stock):
         '''Добавление продукта к акции'''
-        url = self.url + self.version + "/actions/products/activate"
         params = {
-            "action_id": action_id,
-            "products": [
+            'action_id': action_id,
+            'products': [
                 {
-                    "action_price": action_price,
-                    "product_id": product_id,
-                    "stock": stock,
+                    'action_price': action_price,
+                    'product_id': product_id,
+                    'stock': stock,
                 }
             ]
         }
         result = self.do_request('post', '/actions/products/activate', params)
-        products_actions = result['result']['product_ids'] if result['flag'] else {}
+        products_actions = getattr(result, 'product_ids', {})
         return products_actions
 
-    def do_request(self, type_request, type, params):
+    def do_request(self, type_request, type, params=None):
         '''Выполнение запросов'''
         url = self.url + self.version + type
         headers = self.get_headers()
@@ -58,8 +56,8 @@ class OzoneSeller:
         else:
             result = requests.post(url, headers=headers, params=params)
         if result.status_code == 200:
-            return {'flag': True,  'result': result.json()['result']}
+            return result.json()['result']
         else:
             print(result.json()['message'])
-            return {'flag': False, 'result': {}}
+            return {}
 
