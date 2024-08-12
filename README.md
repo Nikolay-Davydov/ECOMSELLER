@@ -1,17 +1,17 @@
-# Сбор сбор данных по API OZON
+# Collection of data via OZON API
 
-В проекте реализован класс реализующий следующие методы:
+The project implements a class that implements the following methods:
 
-- Получение всех акций;
-- Получение товаров подходящих к акции;
-- Добавление продукта к акции;
+- Receiving all promotions;
+- Receiving products suitable for the promotion;
+- Adding a product to the promotion;
 
-Технологии:
+Technologies:
 - Python 3.10
 
-Требования:
-- Установить библиотеку requests;
-- Прописать в файле conf.ini Client-Id и Api-key;
+Requirements:
+- Install the requests library;
+- Write Client-Id and Api-key in the conf.ini file;
 
 
 
